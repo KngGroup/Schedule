@@ -1,0 +1,12 @@
+{
+    "name": "Schedule generator",
+    "description": "generates dates by rules",
+    "keywords": [ "schedule" ],
+    "license": "GNU",
+    "require": {
+        "php": ">=5.3.3"
+    },
+    "autoload": {
+        "psr-0": { "ByDm": "src" }
+    }
+}
