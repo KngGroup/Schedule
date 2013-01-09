@@ -1,5 +1,5 @@
 {
-    "name": "Schedule generator",
+    "name": "bydm/schedule",
     "description": "generates dates by rules",
     "keywords": [ "schedule" ],
     "license": "GNU",
