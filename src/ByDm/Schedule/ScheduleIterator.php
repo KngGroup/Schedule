@@ -124,6 +124,7 @@ class ScheduleIterator implements \IteratorAggregate
             //because start date is not a reccurency
             $limitation--;
         } else {
+            $limitation = clone $limitation;
             //becasuse we want to include end date
             $limitation->modify('+1 day');
         }
