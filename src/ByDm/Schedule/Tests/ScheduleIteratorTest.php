@@ -356,4 +356,77 @@ class ScheduleIteratorTest extends \PHPUnit_Framework_TestCase
         
         return $data;
     }
+    
+    
+    /**
+     * Test for exclude start date
+     * 
+     * @param \Traversable $schedule schedule iterator
+     * @param array $expected expected dates
+     * 
+     * @dataProvider excludeStartDateProvider
+     */
+    public function testExcludeStartDate(\Traversable $schedule, array $expected)
+    {
+        $this->scheduleIteratorTester($schedule, $expected);
+    }
+    
+    public function excludeStartDateProvider()
+    {
+        $data = array();
+        
+        $startDate = new \DateTime('2013-02-14');
+        $dailyScheduleRules = new ScheduleRules();
+        $dailyScheduleRules->setFrequency(ScheduleRulesInterface::DAILY);
+        $dailyScheduleRules->setInterval(1);
+        $dailyScheduleRules->setLimitation(1);
+        
+        $dailySchedule = new ScheduleIterator(clone $startDate, $dailyScheduleRules, true);
+        $data[] = array($dailySchedule, array('2013-02-15'));
+        
+        
+        $weeklyRules = new ScheduleRules();
+        $weeklyRules->setFrequency(ScheduleRulesInterface::WEEKLY);
+        $weeklyRules->setInterval(1);
+        $weeklyRules->setRepeatByDaysOfWeek(array(4));
+        $weeklyRules->setLimitation(1);
+        
+        $firstWeeklySchedule = new ScheduleIterator(clone $startDate, $weeklyRules, true);
+        $data[] = array($firstWeeklySchedule, array('2013-02-21'));
+        
+        //start date is already excluded
+        $secondWeeklySchedule = new ScheduleIterator(new \DateTime('2013-02-15'), $weeklyRules, true);
+        $data[] = array($secondWeeklySchedule, array('2013-02-21'));
+        
+        $monthlyRules = new ScheduleRules();
+        $monthlyRules->setFrequency(ScheduleRules::MONTHLY);
+        $monthlyRules->setInterval(1);
+        $monthlyRules->setLimitation(1);
+        $monthlyRules->setRepeatByDay(14);
+        
+        $monthlySchedule = new ScheduleIterator(clone $startDate, $monthlyRules, true);
+        $data[] = array($monthlySchedule, array('2013-03-14'));
+        
+        //start date is already excluded
+        $secondMonthlySchedule = new ScheduleIterator(new \DateTime('2013-02-15'), $monthlyRules, true);
+        $data[] = array($secondMonthlySchedule, array('2013-03-14'));
+        
+        $yearlyRules = new ScheduleRules();
+        $yearlyRules->setFrequency(ScheduleRules::YEARLY);
+        $yearlyRules->setInterval(1);
+        $yearlyRules->setLimitation(1);
+        $yearlyRules->setRepeatByDay(14);
+        $yearlyRules->setRepeatByMonth(2);
+        $yearlySchedule = new ScheduleIterator(clone $startDate, $yearlyRules, true);
+        $data[] = array($yearlySchedule, array('2014-02-14'));
+        
+        //start date is already excluded
+        $secondYearlyRules = clone $yearlyRules;
+        $secondYearlyRules->setRepeatByDay(1);
+        $secondYearlySchedule = new ScheduleIterator(clone $startDate, $secondYearlyRules, true);
+        $data[] = array($secondYearlySchedule, array('2014-02-01'));
+        
+        return $data;
+    }
+    
 }

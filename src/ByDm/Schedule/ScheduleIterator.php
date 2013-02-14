@@ -27,7 +27,8 @@ class ScheduleIterator implements \IteratorAggregate
      */
     public function __construct(
         \DateTime $startDate, 
-        ScheduleRulesInterface $rules
+        ScheduleRulesInterface $rules,
+        $excludeStartDate = false
     ) {
         $startDate = clone $startDate;
         
@@ -55,6 +56,8 @@ class ScheduleIterator implements \IteratorAggregate
                             $startDate->modify(
                                 'next ' . $dateUtil->getDayOfWeekName($dayOfWeek)
                             );
+                            // start date is already excluded now
+                            $excludeStartDate = false;
                         }
                         
                     }
@@ -74,12 +77,18 @@ class ScheduleIterator implements \IteratorAggregate
                         $addMonth = true;
                     }
                     
-                    $startDate = new \DateTime(
-                        $startDate->format('Y-m-' . sprintf('%02d', $repeatByDay))
-                    );
+                    if ($startDate->format('d') != $repeatByDay) {
+                        $startDate = new \DateTime(
+                            $startDate->format('Y-m-' . sprintf('%02d', $repeatByDay))
+                        );
+                        // start date is already excluded now
+                        $excludeStartDate = false;
+                    }
                     
                     if ($addMonth) {
                         $startDate->modify('+' . $interval . 'month');
+                        // start date is already excluded now
+                        $excludeStartDate = false;
                     }
                 }
                 
@@ -105,10 +114,18 @@ class ScheduleIterator implements \IteratorAggregate
                         $month = sprintf('%02d', $repeatByMonth);
                     }
                     
-                    $startDate = new \DateTime($year . '-' . $month . '-' . $day);
+                    $startDateStr = $year . '-' . $month . '-' . $day;
+                    if ($startDate->format('Y-m-d') !== $startDateStr) {
+                        $startDate = new \DateTime($year . '-' . $month . '-' . $day);
+                        // start date is already excluded now
+                        $excludeStartDate = false;
+                    }
+                    
                     
                     if ($previousStartDate->format('Ymd') > $startDate->format('Ymd')) {
                         $startDate->modify('+' . $interval . 'year');
+                        // start date is already excluded now
+                        $excludeStartDate = false;
                     }
                 }
                 
@@ -121,8 +138,10 @@ class ScheduleIterator implements \IteratorAggregate
         
         $limitation = $rules->getLimitation();
         if (!$limitation instanceof \DateTime) {
-            //because start date is not a reccurency
-            $limitation--;
+            if (!$excludeStartDate) {
+                //because start date is not a reccurency
+                $limitation--;
+            }
         } else {
             $limitation = clone $limitation;
             //becasuse we want to include end date
@@ -133,7 +152,8 @@ class ScheduleIterator implements \IteratorAggregate
             $this->iterator = new \DatePeriod(
                 $startDate, 
                 $dateInterval, 
-                $limitation
+                $limitation,
+                $excludeStartDate
             );
         }
     }

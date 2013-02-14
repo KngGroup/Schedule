@@ -58,11 +58,13 @@ class WeeklyIterator implements \Iterator
      * @param \DateTime $startDate initial date
      * @param \ByDm\Schedule\ScheduleRulesInterface $rules repetition rules
      * @param integer|\DateTime $recurrences number of recurrences or end date
+     * @param boolean $excludeStartDate if true then start date will be excluded
      */
     public function __construct(
         Date $dateUtil,    
         \DateTime $startDate, 
-        ScheduleRulesInterface $rules
+        ScheduleRulesInterface $rules,
+        $excludeStartDate = false
     ) {
         $startDate = clone $startDate;
         
@@ -75,7 +77,7 @@ class WeeklyIterator implements \Iterator
         //then modify start date considering interval
         $modifyStartDateWithInterval = false;
         
-        if (!in_array($startDateWeekDay, $this->daysOfWeek)) {
+        if (!in_array($startDateWeekDay, $this->daysOfWeek) || $excludeStartDate) {
             $this->curDayOfWeekIndex = $dateUtil->modifyToClosestWeekday(
                 $startDate, 
                 $this->daysOfWeek

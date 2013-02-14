@@ -83,4 +83,39 @@ class WeeklyIteratorTest extends \PHPUnit_Framework_TestCase
         
         return $data;
     }
+    
+    /**
+     * Test exclude start date
+     * 
+     * @dataProvider excludeStartDateProvider
+     */
+    public function testExcludeStartDate(WeeklyIterator $weeklyIterator, array $expectedDates)
+    {
+        $this->testWeeklyIterator($weeklyIterator, $expectedDates);
+    }
+    
+    public function excludeStartDateProvider()
+    {
+        $data = array();
+        
+        $dateUtil = new Date();
+        $startDate = new \DateTime('2013-02-14');
+        $scheduleRules = new ScheduleRules();
+        $scheduleRules->setFrequency(ScheduleRulesInterface::WEEKLY);
+        
+        $scheduleRules->setInterval(1)
+                      ->setRepeatByDaysOfWeek(array(4, 1))
+                      ->setLimitation(1);    
+        
+        $firstSchedule = new WeeklyIterator($dateUtil, clone $startDate, $scheduleRules, true);
+        
+        $data[] = array($firstSchedule, array('2013-02-18'));
+        
+        $secondScheduleRules = clone $scheduleRules;
+        $secondScheduleRules->setRepeatByDaysOfWeek(array(5));
+        $secondSchedule = new WeeklyIterator($dateUtil, clone $startDate, $secondScheduleRules, true);
+        $data[] = array($secondSchedule, array('2013-02-15'));
+        
+        return $data;
+    }
 }
