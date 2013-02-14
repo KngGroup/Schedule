@@ -48,7 +48,7 @@ class ScheduleIterator implements \IteratorAggregate
                 $dateUtil = new Date();
                 $repeatByDaysOfWeek = $rules->getRepeatByDaysOfWeek();
                 if (count($repeatByDaysOfWeek) > 1) {
-                    $this->iterator = new WeeklyIterator($dateUtil, $startDate, $rules);
+                    $this->iterator = new WeeklyIterator($dateUtil, $startDate, $rules, $excludeStartDate);
                 } else {
                     if (!empty($repeatByDaysOfWeek)) {
                         $dayOfWeek = $repeatByDaysOfWeek[0];
